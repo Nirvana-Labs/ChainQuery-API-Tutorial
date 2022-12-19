@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
 export default function SocketIoApi() {
@@ -8,14 +8,17 @@ export default function SocketIoApi() {
   const socket = io(`ws://132.145.152.27:8083`);
   // const socket = io(`http://localhost:8081`);
 
-  socket.on("connect", () => {
-    setInterval(function(){
-      socket.emit("get:txns-latest", { limit: 10 }, (rows) => {
-        console.log(rows);
-        setData(rows);
-      });
-    }, 5000);
-  });
+  function emitAndListen() {
+    socket.emit("get:txns-latest", { limit: 10 }, (rows) => {
+      setData(rows);
+    });
+  }
+
+  useEffect(() => {
+    emitAndListen();
+    const interval = setInterval(emitAndListen, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   if (!data) return(<div>Loading...</div>);
 
