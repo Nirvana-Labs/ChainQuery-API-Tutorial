@@ -8,7 +8,7 @@ export default function SocketIoApi() {
   const socket = io(`ws://132.145.152.27:8083`);
   // const socket = io(`http://localhost:8081`);
 
-  function emitAndListen() {
+  const emitAndListen = () => {
     socket.emit("get:txns-latest", { limit: 10 }, (rows) => {
       setData(rows);
     });
